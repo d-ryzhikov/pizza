@@ -10,23 +10,28 @@ Parentheses = namedtuple("Parentheses", "start end")
 def parentheses_substr(s, pair: Parentheses):
     """
     >>> p = Parentheses("{", "}")
-    >>> parentheses_substr("spam {top {kek}}", p)
+    >>> parentheses_substr("spam }{top {kek}}", p)
     '{top {kek}}'
     """
-    start_index = s.find(pair.start)
-    if start_index == -1:
-        raise ValueError("No start parenthesis found")
-    substr = s[start_index:]
     depth = 0
+    started = False
+    start_index = None
 
-    for index, char in enumerate(substr):
-        if char == pair.end:
-            depth -= 1
-        if char == pair.start:
-            depth += 1
-        if char == pair.end and not depth:
-            return substr[:index + 1]
-    raise ValueError("No matching end parenthesis found")
+    for index, char in enumerate(s):
+        if not started:
+            if char == pair.start:
+                started = True
+                start_index = index
+                depth = 1
+        else:
+            if char == pair.start:
+                depth += 1
+            elif char == pair.end:
+                depth -= 1
+            if not depth:
+                return s[start_index:index + 1]
+
+    raise ValueError("No matching pair of parentheses found")
 
 
 MENU_URL = "https://www.papajohns.by/menyu/pizza"
